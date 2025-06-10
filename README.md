@@ -170,6 +170,22 @@ calendar.roll_backward(date).strftime("%A, %d %B %Y")
 # => "Friday, 13 June 2014"
 ```
 
+The `next_business_day` and `previous_business_day` methods will always move to the next or previous business day, regardless of whether the given date is already a business day.
+
+```ruby
+date = Date.parse("Friday, 13 June 2014")  # A business day
+calendar.next_business_day(date).strftime("%A, %d %B %Y")
+# => "Monday, 16 June 2014"
+calendar.previous_business_day(date).strftime("%A, %d %B %Y")
+# => "Thursday, 12 June 2014"
+
+date = Date.parse("Saturday, 14 June 2014")  # A weekend
+calendar.next_business_day(date).strftime("%A, %d %B %Y")
+# => "Monday, 16 June 2014"
+calendar.previous_business_day(date).strftime("%A, %d %B %Y")
+# => "Friday, 13 June 2014"
+```
+
 To count the number of business days between two dates, pass the dates to `business_days_between`. This method counts from start of the first date to start of the second date. So, assuming no holidays, there would be two business days between a Monday and a Wednesday.
 
 ```ruby
