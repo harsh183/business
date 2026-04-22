@@ -178,6 +178,18 @@ calendar.business_days_between(date, date + 7)
 # => 5
 ```
 
+To find out which business day of the month it is, use `get_business_day_of_month` which uses `business_days_between` under the hood. It returns the running total of business days for a given date in that month. This includes the day itself. If the given day is not a business day, it wil roll backward to the last one. It is 1 indexed, with the first business day as 1 and days before the first business day as 0.
+
+```ruby
+calendar.get_business_day_of_month(Date.parse("2026-01-01")) # => 1 (Start of Month Thu)
+calendar.get_business_day_of_month(Date.parse("2026-01-02")) # => 1 (Weekday Holiday Fri)
+calendar.get_business_day_of_month(Date.parse("2026-01-03")) # => 1 (Weekend Default Holiday Sat)
+calendar.get_business_day_of_month(Date.parse("2026-01-04")) # => 2 (Weekend Extra Working Day)
+calendar.get_business_day_of_month(Date.parse("2026-01-05")) # => 3 (Weekday after Weekend)
+calendar.get_business_day_of_month(Date.parse("2026-02-01")) # => 0 (No business days in month yet)
+calendar.get_business_day_of_month(Date.parse("2026-02-02")) # => 1 (First business day in month)
+```
+
 ## But other libraries already do this
 
 Another gem, [business_time](https://github.com/bokmann/business_time), also exists for this purpose. We previously used business_time, but encountered several issues that prompted us to start business.
@@ -185,7 +197,7 @@ Another gem, [business_time](https://github.com/bokmann/business_time), also exi
 Firstly, business_time works by monkey-patching `Date`, `Time`, and `FixNum`. While this enables syntax like `Time.now + 1.business_day`, it means that all configuration has to be global. GoCardless handles payments across several geographies, so being able to work with multiple working-day calendars is
 essential for us. Business provides a simple `Calendar` class, that is initialized with a configuration that specifies which days of the week are considered to be working days, and which dates are holidays.
 
-Secondly, business_time supports calculations on times as well as dates. For our purposes, date-based calculations are sufficient. Supporting time-based calculations as well makes the code significantly more complex. We chose to avoid this extra complexity by sticking solely to date-based mathematics.
+Secondly, business_time supports calculations on times as well as dates. For Gocardless's purposes, date-based calculations are sufficient. Supporting time-based calculations as well makes the code significantly more complex. We chose to avoid this extra complexity by sticking solely to date-based mathematics.
 
 <p align="center"><img src="http://3.bp.blogspot.com/-aq4iOz2OZzs/Ty8xaQwMhtI/AAAAAAAABrM/-vn4tcRA9-4/s1600/daily-morning-awesomeness-243.jpeg" alt="I'm late for business" width="250"/></p>
 

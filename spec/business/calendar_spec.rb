@@ -934,6 +934,26 @@ RSpec.describe Business::Calendar do
         end
       end
     end
+
+    describe "#get_business_day_of_month" do
+      it "gets the correct day for various scenarios" do 
+        calendar = described_class.new(name: "test", holidays: ["Friday 2nd Jan, 2026"], extra_working_dates: ["2026-01-04"])
+
+        {
+          "2026-01-01" => [1, "Start of Month Thu"],
+          "2026-01-02" => [1, "Weekday Holiday Fri"],
+          "2026-01-03" => [1, "Weekend Default Holiday Sat"],
+          "2026-01-04" => [2, "Weekend Extra Working Day"],
+          "2026-01-05" => [3, "Weekday after Weekend"],
+          "2026-02-01" => [0, "No business days in month yet"],
+          "2026-02-02" => [1, "First business day in month"]
+        }.each do |date, (expected_output, test_name)|
+          actual_output = calendar.get_business_day_of_month(date_class.parse(date))
+          expect(actual_output).to be(expected_output), 
+                                   "#{test_name} #{date} - Expected #{actual_output} to be #{expected_output}"
+        end
+      end
+    end
   end
 
   context "(using Date objects)" do

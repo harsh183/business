@@ -183,6 +183,22 @@ module Business
       num_biz_days + remaining_range.count { |a| business_day?(a) }
     end
 
+    # get_business_day_of_month method returns the running total of business days for a given date in that month. 
+    # This includes the day itself. If the given day is not a business day, it wil roll backward to the last one
+    # This is 1 indexed, with the first business day as 1 and days before the first business day as 0
+    # This method counts the number of business days from the start of the first day of the month to the given input date.
+    def get_business_day_of_month(date)
+      date = date.to_date
+      first_of_month = Date.new(date.year, date.month, 1)
+      given_date_rolled_back = roll_backward(date)
+      
+      # If we go to the last month it means we aren't at this month's first working day
+      return 0 if given_date_rolled_back < first_of_month 
+
+      # Add 1 since we 1-index
+      business_days_between(first_of_month, given_date_rolled_back) + 1
+    end
+
     def day_interval_for(date)
       date.is_a?(Date) ? 1 : 3600 * 24
     end
